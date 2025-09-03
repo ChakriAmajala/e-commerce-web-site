@@ -1,16 +1,23 @@
-FROM nginx:alpine
+# Stage 1: Build Java project using Maven
+FROM maven:3.9.3-eclipse-temurin-17 AS build
 
-# Remove default nginx website
-RUN rm -rf /usr/share/nginx/html/*
+WORKDIR /app
 
-# Copy only the website files
-COPY src/ /usr/share/nginx/html/
+# Copy pom.xml and source code
+COPY pom.xml .
+COPY src ./src
 
-# Fix permissions
-RUN chmod -R 755 /usr/share/nginx/html
+# Package the application (skip tests for faster build)
+RUN mvn clean package -DskipTests
 
-# Expose port 80
-EXPOSE 80
+# Stage 2: Run the built JAR
+FROM openjdk:17-jdk-slim
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+WORKDIR /app
+
+# Copy the JAR file from build stage
+COPY --from=build /app/target/*.jar app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
