@@ -2,8 +2,7 @@ pipeline {
   agent any
 
   environment {
-    DOCKERHUB_USER = credentials('dockerhub-username')
-    DOCKERHUB_PASS = credentials('dockerhub-password')
+    DOCKERHUB = credentials('dockerhub')   // <-- same ID
     REPO = "chakriamajalahub/e-commerce-web-site-frontend"
     TAG = "${env.BUILD_NUMBER}"
   }
@@ -15,18 +14,16 @@ pipeline {
       }
     }
 
-    stage('Build Frontend Docker Image') {
+    stage('Build Docker Image') {
       steps {
-        dir('frontend') {
-          sh "docker build -t $REPO:$TAG ."
-        }
+        sh "docker build -t $REPO:$TAG ./frontend"
       }
     }
 
-    stage('Push to DockerHub') {
+    stage('Push Docker Image') {
       steps {
         script {
-          sh "echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin"
+          sh "echo $DOCKERHUB_PSW | docker login -u $DOCKERHUB_USR --password-stdin"
           sh "docker push $REPO:$TAG"
         }
       }
