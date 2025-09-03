@@ -36,7 +36,7 @@ pipeline {
                     docker stop ecommerce || true
                     docker rm ecommerce || true
                     docker pull $REPO:$TAG
-                    docker run -d -p 9091:80 --name ecommerce $REPO:$TAG
+                    docker run -d -p 9092:80 --name ecommerce $REPO:$TAG
                 """
             }
         }
