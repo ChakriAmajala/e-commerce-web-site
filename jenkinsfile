@@ -19,17 +19,17 @@ pipeline {
             }
         }
 
-        stage('Run Container') {
-            steps {
-                sh """
-                    docker stop ecommerce || true
-                    docker rm ecommerce || true
-                    docker pull $REPO:$TAG
-                    docker run -d -p 9092:80 --name ecommerce $REPO:$TAG
-                """
-            }
-        }
+    stage('Run Container') {
+    steps {
+        echo "Stopping old container if exists..."
+        sh "docker stop ecommerce || true"
+        sh "docker rm ecommerce || true"
+
+        echo "Running container..."
+        sh "docker run -d --name ecommerce -p 9095:80 chakriamajaladocker/e-commerce-web-site-frontend:${BUILD_NUMBER}"
     }
+}
+
 
     post {
         success {
