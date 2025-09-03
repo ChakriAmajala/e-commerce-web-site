@@ -1,0 +1,36 @@
+pipeline {
+  agent any
+
+  environment {
+    DOCKERHUB_USER = credentials('dockerhub-username')
+    DOCKERHUB_PASS = credentials('dockerhub-password')
+    REPO = "chakriamajalahub/e-commerce-web-site-frontend"
+    TAG = "${env.BUILD_NUMBER}"
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage('Build Frontend Docker Image') {
+      steps {
+        dir('frontend') {
+          sh "docker build -t $REPO:$TAG ."
+        }
+      }
+    }
+
+    stage('Push to DockerHub') {
+      steps {
+        script {
+          sh "echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin"
+          sh "docker push $REPO:$TAG"
+        }
+      }
+    }
+  }
+}
+
