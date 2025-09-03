@@ -30,15 +30,6 @@ pipeline {
     }
 }
 
-
-    post {
-        success {
-            echo "🚀 Site running at: http://<SERVER_IP>:9091"
-        }
-        failure {
-            echo "❌ Build/Deploy failed. Check logs!"
-        }
-}
     }
 }
 
