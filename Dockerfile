@@ -1,26 +1,31 @@
-# Stage 1: Build
-FROM maven:3.9.3-eclipse-temurin-17 AS build
+# ---------- Stage 1: Build React frontend ----------
+FROM node:20-alpine AS frontend-build
 
 WORKDIR /app
 
-# Copy pom.xml and download dependencies
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
+COPY package*.json ./
+RUN npm install
 
-# Copy source code
+COPY public ./public
 COPY src ./src
 
-# Build JAR
-RUN mvn clean package -DskipTests
+RUN npm run build   # builds frontend -> /app/build
 
-# Stage 2: Run
-FROM openjdk:17-jdk-slim
+# ---------- Stage 2: Setup backend ----------
+FROM node:20-alpine AS backend
 
 WORKDIR /app
 
-# Copy JAR from build stage into /app/app.jar
-COPY --from=build /app/target/*.jar app.jar
+# Copy backend package.json and install
+COPY backend/package*.json ./backend/
+RUN cd backend && npm install
 
-EXPOSE 8080
+# Copy backend source
+COPY backend ./backend
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Copy frontend build into backend (if backend serves frontend)
+COPY --from=frontend-build /app/build ./backend/build
+
+WORKDIR /app/backend
+EXPOSE 5000
+CMD ["node", "index.js"]
