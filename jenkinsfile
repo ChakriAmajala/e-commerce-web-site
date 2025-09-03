@@ -9,12 +9,11 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/ChakriAmajala/e-commerce-web-site.git'
-            }
-        }
-
+    stage('Checkout') {
+    steps {
+        git branch: 'main', url: 'https://github.com/ChakriAmajala/e-commerce-web-site.git'
+    }
+}
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t $REGISTRY/$REPO/$DOCKER_IMAGE:$DOCKER_TAG .'
