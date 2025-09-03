@@ -1,33 +1,33 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    DOCKERHUB = credentials('dockerhub')   // <-- same ID
-    REPO = "chakriamajalahub/e-commerce-web-site-frontend"
-    TAG = "${env.BUILD_NUMBER}"
-  }
-
-  stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
+    environment {
+        REPO = "chakriamajalahub/e-commerce-web-site-frontend"
+        TAG = "${env.BUILD_NUMBER}"
     }
 
-    stage('Build Docker Image') {
-      steps {
-        sh "docker build -t $REPO:$TAG ."
-      }
-    }
-
-    stage('Push Docker Image') {
-      steps {
-        script {
-          sh "echo $DOCKERHUB_PSW | docker login -u $DOCKERHUB_USR --password-stdin"
-          sh "docker push $REPO:$TAG"
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
         }
-      }
-    }
-  }
-}
 
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build -t $REPO:$TAG ."
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh """
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker push $REPO:$TAG
+                    """
+                }
+            }
+        }
+    }
+}
