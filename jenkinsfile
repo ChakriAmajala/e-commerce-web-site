@@ -26,7 +26,7 @@ pipeline {
         sh "docker rm ecommerce || true"
 
         echo "Running container..."
-        sh "docker run -d --name ecommerce -p 9095:80 chakriamajalahub/e-commerce-web-site-frontend:${BUILD_NUMBER}"
+        sh "docker run -d --name ecommerce -p 9095:8080 chakriamajalahub/e-commerce-web-site-frontend:${BUILD_NUMBER}"
     }
 }
 
