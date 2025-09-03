@@ -16,7 +16,7 @@ pipeline {
 
     stage('Build Docker Image') {
       steps {
-        sh "docker build -t $REPO:$TAG ./frontend"
+        sh "docker build -t $REPO:$TAG ."
       }
     }
 
